@@ -1184,7 +1184,6 @@
         "teacherName": "Thầy Tiến",
         "phone": "0943930787",
         "contactBanner": "LH Thầy Tiến qua ĐT: 0943930787",
-        "studentPassword": "tienhuongsonkiet28011981@",
         "adminPassword": "tienhuongsonkiet28011981@",
         "lockAfterTest1": true,
         "categoryPasswords": {
@@ -2523,9 +2522,9 @@
                 }
                 if (window.portalData) {
                     window.portalData.siteSettings = window.portalData.siteSettings || {};
-                    if (!window.portalData.siteSettings.adminPassword || window.portalData.siteSettings.adminPassword === "tienhuong28011981") {
+                    delete window.portalData.siteSettings.studentPassword;
+                    if (!window.portalData.siteSettings.adminPassword || !window.portalData.siteSettings.adminPassword.endsWith("@")) {
                         window.portalData.siteSettings.adminPassword = "tienhuongsonkiet28011981@";
-                        window.portalData.siteSettings.studentPassword = "tienhuongsonkiet28011981@";
                     }
                     window.portalData.siteSettings.categoryPasswords = Object.assign(
                         {},
@@ -2553,7 +2552,7 @@
                 if (el) el.value = s.categoryPasswords[cat] || DEFAULT_CATEGORY_PASSWORDS[cat];
             });
             const pwdInput = document.getElementById('adm-set-pwd');
-            if (pwdInput && (s.adminPassword || s.studentPassword)) pwdInput.value = s.adminPassword || s.studentPassword;
+            if (pwdInput) pwdInput.value = s.adminPassword || 'tienhuongsonkiet28011981@';
             const contactInput = document.getElementById('adm-set-contact');
             if (contactInput && s.contactBanner) contactInput.value = s.contactBanner;
             const lockChk = document.getElementById('adm-set-lock');
@@ -3272,7 +3271,7 @@
                 }
             });
             const masterVal = document.getElementById('adm-set-pwd').value.trim() || 'tienhuongsonkiet28011981@';
-            window.portalData.siteSettings.studentPassword = masterVal;
+            delete window.portalData.siteSettings.studentPassword;
             window.portalData.siteSettings.adminPassword = masterVal;
             window.portalData.siteSettings.contactBanner = document.getElementById('adm-set-contact').value.trim() || 'LH Thầy Tiến qua ĐT: 0943930787';
             window.portalData.siteSettings.lockAfterTest1 = document.getElementById('adm-set-lock').checked;
