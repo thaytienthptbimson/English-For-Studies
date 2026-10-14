@@ -1,4 +1,4 @@
-// DỮ LIỆU MỞ RỘNG: NGỮ PHÁP, TỪ VỰNG, GLOBAL SUCCESS 10-11-12 (TEST 1-5 NGỮ PHÁP/TỪ VỰNG THEO ĐÚNG 1 UNIT, TEST 6-10 ĐỀ TỐT NGHIỆP 2026 40 CÂU CHUẨN SỐ THỨ TỰ), ĐGNL HSA 2026 & V-ACT, HSG LỚP 9
+// DỮ LIỆU MỞ RỘNG: NGỮ PHÁP, TỪ VỰNG, GLOBAL SUCCESS 10-11-12, ĐGNL HSA 2026 & V-ACT, HSG LỚP 9 & MẬT KHẨU RIÊNG TỪNG PHẦN
 window.portalData = {
   "siteSettings": {
     "siteTitle": "HỆ THỐNG HỌC TIẾNG ANH & LUYỆN THI TOÀN DIỆN — THẦY TIẾN",
@@ -7,7 +7,19 @@ window.portalData = {
     "contactBanner": "LH Thầy Tiến qua ĐT: 0943930787",
     "studentPassword": "tienhuong28011981",
     "adminPassword": "tienhuong28011981",
-    "lockAfterTest1": true
+    "lockAfterTest1": true,
+    "categoryPasswords": {
+      "grammar_vocab": "1@123",
+      "gs10": "tien123@",
+      "gs11": "huong123@",
+      "gs12": "son123@",
+      "hsa_vact": "kiet123#",
+      "hsg9": "tienhuong123@",
+      "listening": "sonkiet123@",
+      "lexico": "tienson123@",
+      "reading": "huongkiet123@",
+      "full": "huongson123@"
+    }
   },
   "grammarNotes": [
     {
