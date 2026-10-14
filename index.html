@@ -636,7 +636,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Mật khẩu Quản trị viên / Mở khóa tổng toàn hệ thống:</label>
-                            <input id="adm-set-pwd" type="text" value="tienhuong28011981" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold text-blue-900">
+                            <input id="adm-set-pwd" type="text" value="tienhuongsonkiet28011981@" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold text-blue-900">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Dòng chữ Liên hệ hiển thị trên hộp thoại khóa &amp; kết quả:</label>
@@ -1184,8 +1184,8 @@
         "teacherName": "Thầy Tiến",
         "phone": "0943930787",
         "contactBanner": "LH Thầy Tiến qua ĐT: 0943930787",
-        "studentPassword": "tienhuong28011981",
-        "adminPassword": "tienhuong28011981",
+        "studentPassword": "tienhuongsonkiet28011981@",
+        "adminPassword": "tienhuongsonkiet28011981@",
         "lockAfterTest1": true,
         "categoryPasswords": {
             "grammar_vocab": "1@123",
@@ -1422,6 +1422,7 @@
         let timeLeft = 90 * 60;
         let isSubmitted = false;
         let isUnlocked = false; 
+        let isAdminAuthenticated = false;
         let unlockedCategories = {};
         let pendingAction = null; 
 
@@ -2400,19 +2401,32 @@
         }
 
         function showPasswordModal(cat) {
-            const targetCat = (pendingAction && pendingAction.cat) || cat || currentCategory;
-            const cfg = categoryConfig[targetCat];
-            const catTitle = cfg ? cfg.name : targetCat;
+            const isAdminMode = (cat === 'admin') || (pendingAction && pendingAction.type === 'admin');
             const titleEl = document.getElementById('password-modal-title');
-            if (titleEl) titleEl.innerText = `Yêu cầu mật khẩu — ${catTitle}`;
             const descEl = document.getElementById('password-modal-desc');
-            if (descEl) {
-                descEl.innerHTML = `Vui lòng nhập mật khẩu riêng của phần <b>${catTitle}</b> để mở khóa toàn bộ các bài Test (Test 2 → Test 10) trong chuyên mục này.`;
+            const inputEl = document.getElementById('password-input');
+            if (isAdminMode) {
+                if (titleEl) titleEl.innerText = '🔐 Đăng nhập Trang Quản Trị (CMS)';
+                if (descEl) {
+                    descEl.innerHTML = 'Vui lòng nhập <b>Mật khẩu Quản trị viên</b> để truy cập hệ thống Quản trị &amp; Ra đề (CMS).';
+                }
+                if (inputEl) inputEl.placeholder = 'Nhập mật khẩu Quản trị viên...';
+            } else {
+                const targetCat = (pendingAction && pendingAction.cat) || cat || currentCategory;
+                const cfg = categoryConfig[targetCat];
+                const catTitle = cfg ? cfg.name : targetCat;
+                if (titleEl) titleEl.innerText = `Yêu cầu mật khẩu — ${catTitle}`;
+                if (descEl) {
+                    descEl.innerHTML = `Vui lòng nhập mật khẩu riêng của phần <b>${catTitle}</b> để mở khóa toàn bộ các bài Test (Test 2 → Test 10) trong chuyên mục này.`;
+                }
+                if (inputEl) inputEl.placeholder = 'Nhập mật khẩu mở khóa phần này...';
             }
             document.getElementById('password-modal').classList.remove('hidden-element');
             document.getElementById('password-error').classList.add('hidden-element');
-            document.getElementById('password-input').value = '';
-            document.getElementById('password-input').focus();
+            if (inputEl) {
+                inputEl.value = '';
+                inputEl.focus();
+            }
         }
 
         function closeModal() {
@@ -2422,14 +2436,31 @@
 
         function checkPassword() {
             const pwd = document.getElementById('password-input').value.trim();
+            const isAdminMode = Boolean(pendingAction && pendingAction.type === 'admin');
             const targetCat = (pendingAction && pendingAction.cat) || currentCategory;
             const expectedCatPwd = getCategoryPassword(targetCat);
             const masterPwd = (window.portalData && window.portalData.siteSettings && window.portalData.siteSettings.adminPassword)
                 ? window.portalData.siteSettings.adminPassword
-                : "tienhuong28011981";
+                : "tienhuongsonkiet28011981@";
 
-            if (pwd === expectedCatPwd || pwd === masterPwd || pwd === "tienhuong28011981") {
-                if (pwd === masterPwd || pwd === "tienhuong28011981") {
+            if (isAdminMode) {
+                if (pwd === masterPwd || pwd === "tienhuongsonkiet28011981@") {
+                    isAdminAuthenticated = true;
+                    isUnlocked = true;
+                    Object.keys(DEFAULT_CATEGORY_PASSWORDS).forEach(k => { unlockedCategories[k] = true; });
+                    document.getElementById('password-modal').classList.add('hidden-element');
+                    pendingAction = null;
+                    showToast("🔓 Đăng nhập Quản trị viên thành công! Đã mở khóa Trang Quản Trị & toàn bộ kho đề.");
+                    openAdminPanel(true);
+                } else {
+                    document.getElementById('password-error').classList.remove('hidden-element');
+                }
+                return;
+            }
+
+            if (pwd === expectedCatPwd || pwd === masterPwd || pwd === "tienhuongsonkiet28011981@") {
+                if (pwd === masterPwd || pwd === "tienhuongsonkiet28011981@") {
+                    isAdminAuthenticated = true;
                     isUnlocked = true;
                     Object.keys(DEFAULT_CATEGORY_PASSWORDS).forEach(k => { unlockedCategories[k] = true; });
                     showToast("🔓 Đã mở khóa toàn bộ tất cả các phần bằng mật khẩu Quản trị!");
@@ -2492,6 +2523,10 @@
                 }
                 if (window.portalData) {
                     window.portalData.siteSettings = window.portalData.siteSettings || {};
+                    if (!window.portalData.siteSettings.adminPassword || window.portalData.siteSettings.adminPassword === "tienhuong28011981") {
+                        window.portalData.siteSettings.adminPassword = "tienhuongsonkiet28011981@";
+                        window.portalData.siteSettings.studentPassword = "tienhuongsonkiet28011981@";
+                    }
                     window.portalData.siteSettings.categoryPasswords = Object.assign(
                         {},
                         DEFAULT_CATEGORY_PASSWORDS,
@@ -2725,9 +2760,16 @@
         /* =========================================================================
            PHÂN HỆ QUẢN TRỊ NỘI DUNG (ADMIN CMS) HOẠT ĐỘNG TRỰC TIẾP 100%
         ========================================================================= */
-        function openAdminPanel() {
+        function openAdminPanel(forceAuth) {
             stopTTS();
-            isUnlocked = true; // Khi Giáo viên mở Admin CMS, tự động cấp quyền mở khóa để quản trị & xem thử mọi đề
+            if (!isAdminAuthenticated && !forceAuth) {
+                pendingAction = { type: 'admin' };
+                showPasswordModal('admin');
+                return;
+            }
+            isAdminAuthenticated = true;
+            isUnlocked = true; // Khi Giáo viên đăng nhập Admin CMS thành công, cấp quyền mở khóa để quản trị & xem thử mọi đề
+            Object.keys(DEFAULT_CATEGORY_PASSWORDS).forEach(k => { unlockedCategories[k] = true; });
             renderSidebar();
             document.getElementById('welcome-screen').classList.add('hidden-element');
             document.getElementById('test-screen').classList.add('hidden-element');
@@ -3229,7 +3271,7 @@
                     window.portalData.siteSettings.categoryPasswords[cat] = DEFAULT_CATEGORY_PASSWORDS[cat];
                 }
             });
-            const masterVal = document.getElementById('adm-set-pwd').value.trim() || 'tienhuong28011981';
+            const masterVal = document.getElementById('adm-set-pwd').value.trim() || 'tienhuongsonkiet28011981@';
             window.portalData.siteSettings.studentPassword = masterVal;
             window.portalData.siteSettings.adminPassword = masterVal;
             window.portalData.siteSettings.contactBanner = document.getElementById('adm-set-contact').value.trim() || 'LH Thầy Tiến qua ĐT: 0943930787';
@@ -3237,22 +3279,24 @@
             safeSetItem('thaytien_custom_portal_meta', JSON.stringify(window.portalData));
             applySiteSettingsToUI();
             renderSidebar();
-            showToast('✅ Đã lưu cấu hình mật khẩu riêng cho 10 phần & thông tin liên hệ!');
+            showToast('✅ Đã lưu cấu hình mật khẩu Quản trị & 10 phần học sinh!');
         }
 
         function lockStudentSessionForTesting() {
             isUnlocked = false;
+            isAdminAuthenticated = false;
             unlockedCategories = {};
             window.portalData.siteSettings.lockAfterTest1 = true;
             document.getElementById('adm-set-lock').checked = true;
             renderSidebar();
             updateAdminDashboardStats();
             showWelcomeHome();
-            showToast('🔒 Đã bật chế độ Học sinh (Khóa Test 2–10 theo mật khẩu riêng từng phần).');
+            showToast('🔒 Đã bật chế độ Học sinh (Khóa Trang Quản Trị & Khóa Test 2–10 theo mật khẩu riêng từng phần).');
         }
 
         function unlockStudentSessionFromAdmin() {
             isUnlocked = true;
+            isAdminAuthenticated = true;
             Object.keys(DEFAULT_CATEGORY_PASSWORDS).forEach(k => { unlockedCategories[k] = true; });
             renderSidebar();
             updateAdminDashboardStats();
@@ -3262,6 +3306,7 @@
         function resetStudentProgress() {
             safeRemoveItem('thaytien_hsg_thanhhoa_progress');
             isUnlocked = false;
+            isAdminAuthenticated = false;
             unlockedCategories = {};
             renderSidebar();
             renderAdminScoresTable();

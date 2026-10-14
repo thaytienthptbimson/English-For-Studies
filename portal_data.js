@@ -5,8 +5,8 @@ window.portalData = {
     "teacherName": "Thầy Tiến",
     "phone": "0943930787",
     "contactBanner": "LH Thầy Tiến qua ĐT: 0943930787",
-    "studentPassword": "tienhuong28011981",
-    "adminPassword": "tienhuong28011981",
+    "studentPassword": "tienhuongsonkiet28011981@",
+    "adminPassword": "tienhuongsonkiet28011981@",
     "lockAfterTest1": true,
     "categoryPasswords": {
       "grammar_vocab": "1@123",
